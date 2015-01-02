@@ -1,70 +1,59 @@
-module fifo #(parameter B=8, W=4) (
-                                   input wire clk, reset,
-                                   input wire rd, wr,
-                                   input wire [B-1:0] w_data,
-                                   output wire empty, full,
-                                   output wire [B-1:0] r_data
-                                  );
+module fifo (
+    input wire clk, reset,
+    input wire [7:0] w_data,
+    input wire wr, rd,
+    output wire [7:0] r_data,
+    output wire full, empty
+);
 
-    reg [B-1:0] array_reg [2**W-1:0];
-    reg [W-1:0] w_ptr_reg, w_ptr_next, w_ptr_succ;
-    reg [W-1:0] r_ptr_reg, r_ptr_next, r_ptr_succ;
-    reg full_reg, empty_reg, full_next, empty_next;
-    wire wr_en;
+    localparam [4:0] EMPTY = 5'h0,
+                     FULL  = 5'h10;
 
-    always @(posedge clk)
-        if (wr_en)
-            array_reg[w_ptr_reg] <= w_data;
+    reg [3:0] wr_reg, rd_reg, wr_next, rd_next;
+    reg [4:0] cnt_reg, cnt_next;
+    `ifndef TESTBENCH
+    xilinx_dist_ram_16x8 ram_unit (.data_in(w_data), .data_out(r_data),
+                                   .waddr(wr_reg), .raddr(rd_reg), .we(wr), .wclk(clk));
+    `endif
 
-    assign r_data = array_reg[r_ptr_reg];
-    assign wr_en = wr & ~full_reg;
-
-    always @(posedge clk, posedge reset)
+    always @(posedge clk, posedge reset) begin
         if (reset) begin
-            w_ptr_reg <= 0;
-            r_ptr_reg <= 0;
-            full_reg <= 1'b0;
-            empty_reg <= 1'b1;
+            wr_reg <= 8'b0;
+            rd_reg <= 8'b0;
+            cnt_reg <= 16'b0;
         end
         else begin
-            w_ptr_reg <= w_ptr_next;
-            r_ptr_reg <= r_ptr_next;
-            full_reg <= full_next;
-            empty_reg <= empty_next;
+            wr_reg <= wr_next;
+            rd_reg <= rd_next;
+            cnt_reg <= cnt_next;
         end
+    end
 
     always @* begin
-        w_ptr_succ = w_ptr_reg + 1'b1;
-        r_ptr_succ = r_ptr_reg + 1'b1;
-        w_ptr_next = w_ptr_reg;
-        r_ptr_next = r_ptr_reg;
-        full_next = full_reg;
-        empty_next = empty_reg;
+        wr_next = wr_reg;
+        rd_next = rd_reg;
+        cnt_next = cnt_reg;
         case ({wr, rd})
-            2'b01: begin
-                if (~empty_reg) begin
-                    r_ptr_next = r_ptr_succ;
-                    full_next = 1'b0;
-                    if (r_ptr_succ == w_ptr_reg)
-                        empty_next = 1'b1;
+            2'b10: begin
+                if (cnt_reg < FULL) begin
+                    wr_next = wr_reg + 1'b1;
+                    cnt_next = cnt_reg + 1'b1;
                 end
             end
-            2'b10: begin
-                if (~full_reg) begin
-                    w_ptr_next = w_ptr_succ;
-                    empty_next = 1'b0;
-                    if (w_ptr_succ == r_ptr_reg)
-                        full_next = 1'b1;
+            2'b01: begin
+                if (cnt_reg > EMPTY) begin
+                    rd_next = rd_reg + 1'b1;
+                    cnt_next = cnt_reg - 1'b1;
                 end
             end
             2'b11: begin
-                w_ptr_next = w_ptr_succ;
-                r_ptr_next = r_ptr_succ;
+                wr_next = wr_next + 1'b1;
+                rd_next = rd_reg + 1'b1;
             end
         endcase
     end
 
-    assign full = full_reg;
-    assign empty = empty_reg;
+    assign empty = (EMPTY == cnt_reg);
+    assign full = (FULL == cnt_reg);
 
 endmodule

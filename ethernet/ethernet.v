@@ -36,7 +36,7 @@ module ethernet #(parameter B = 8) (
 
     ethernet_smi ethernet_smi_unit (.clk(clk), .reset(reset), .init(smi_init_reg), .register(smi_register_reg), .content(smi_content_reg), .ethernet_mdc(ethernet_mdc), .ethernet_mdio(ethernet_mdio), .ready(smi_ready));
 
-    fifo #(.B(B), .W(7)) fifo_unit0 (.clk(clk), .reset(reset), .rd(ethernet_rd), .wr(ethernet_ready && frame_ready && ~delay), .w_data(frame), .empty(ethernet_empty), .full(ethernet_full), .r_data(frame_rx));
+    fifo fifo_unit0 (.clk(clk), .reset(reset), .rd(ethernet_rd), .wr(ethernet_ready && frame_ready && ~delay), .w_data(frame), .empty(ethernet_empty), .full(ethernet_full), .r_data(frame_rx));
 
     always @(posedge clk, posedge reset)
         if (reset) begin
