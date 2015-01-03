@@ -11,6 +11,7 @@ module ethernet_init (
                      neg       = 2'b10,
                      ready     = 2'b11;
 
+    wire smi_ready;
     reg [1:0] state_reg, state_next;
     reg reset_reg, reset_next;
     reg ready_reg, ready_next;

@@ -159,7 +159,7 @@ NET "reset"           LOC = "B8"  | IOSTANDARD = "LVCMOS33";  #Bank = 0, Pin nam
 
 ##JA
 #NET "JA<0>"          LOC = "T12" | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L19P,                           Sch name = JA1
-#NET "JA<1>"          LOC = "V12" | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L19N,                           Sch name = JA2  
+#NET "JA<1>"          LOC = "V12" | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L19N,                           Sch name = JA2
 #NET "JA<2>"          LOC = "N10" | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L20P,                           Sch name = JA3
 #NET "JA<3>"          LOC = "P11" | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L20N,                           Sch name = JA4
 #NET "JA<4>"          LOC = "M10" | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L22P,                           Sch name = JA7
@@ -200,11 +200,11 @@ NET "reset"           LOC = "B8"  | IOSTANDARD = "LVCMOS33";  #Bank = 0, Pin nam
 
 ## SMSC ethernet PHY
 NET "ethernet_reset"        LOC = "P3"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L2N,                            Sch name = ETH-RST
-NET "ethernet_crs"         LOC = "N3"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L1N_VREF,                       Sch name = ETH-CRS
+#NET "ethernet_crs"         LOC = "N3"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L1N_VREF,                       Sch name = ETH-CRS
 #NET "PhyCol"         LOC = "P4"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L2P,                            Sch name = ETH-COL
 #NET "PhyClk25Mhz"    LOC = "N4"  | IOSTANDARD = "LVCMOS33";   #Unconnected if R172 is not loaded, Bank = 3, Pin name = IO_L1P, Sch name = ETH-CLK25MHZ
 
-#NET "PhyTxd<3>"      LOC = "T1"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L33N_M3DQ13,                    Sch name = ETH-TXD3 
+#NET "PhyTxd<3>"      LOC = "T1"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L33N_M3DQ13,                    Sch name = ETH-TXD3
 #NET "PhyTxd<2>"      LOC = "T2"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L33P_M3DQ12,                    Sch name = ETH-TXD2
 #NET "PhyTxd<1>"      LOC = "U1"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L32N_M3DQ15,                    Sch name = ETH-TXD1
 #NET "PhyTxd<0>"      LOC = "U2"  | IOSTANDARD = "LVCMOS33";   #Bank = 3, Pin name = IO_L32P_M3DQ14,                    Sch name = ETH-TXD0

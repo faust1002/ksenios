@@ -1,10 +1,10 @@
 module ethernet_rx (
                     input wire clk, reset,
                     input wire start,
-                    input wire ethernet_rx_clk, ethernet_rx_dv, ethernet_crs,
+                    input wire ethernet_rx_clk, ethernet_rx_dv,
                     input wire [3:0] ethernet_rx,
                     output wire frame_ready,
-                    output wire [7:0] frame
+                    output wire [3:0] frame
                    );
 
     localparam [1:0] undefined = 2'b00,
@@ -13,74 +13,49 @@ module ethernet_rx (
                      break     = 2'b11;
 
     reg [1:0] state_reg, state_next;
-    reg [7:0] frame_reg, frame_next;
-    reg preamble_reg, preamble_next;
-    reg [1:0] cnt_reg, cnt_next;
+    reg [3:0] frame_reg, frame_next;
+    reg frame_ready_reg, frame_ready_next;
 
-    always @(posedge clk, posedge reset)
+    always @(posedge clk, posedge reset) begin
         if (reset) begin
             state_reg <= undefined;
-            frame_reg <= 8'h0;
-            cnt_reg <= 2'h0;
-            preamble_reg <= 1'b0;
+            frame_reg <= 4'h0;
+            frame_ready_reg <= 1'b0;
         end
         else begin
             state_reg <= state_next;
             frame_reg <= frame_next;
-            cnt_reg <= cnt_next;
-            preamble_reg <= preamble_next;
+            frame_ready_reg <= frame_ready_next;
         end
+    end
 
     always @* begin
         state_next = state_reg;
         frame_next = frame_reg;
-        cnt_next = cnt_reg;
+        frame_ready_next = frame_ready_reg;
         case (state_reg)
             undefined: begin
-                cnt_next = 2'b11;
                 if (start) begin
-                    state_next = idle;
-                end
-            end
-            idle: begin
-                cnt_next = 2'b11;
-                if (ethernet_crs) begin
                     state_next = data;
                 end
             end
             data: begin
-                if (ethernet_rx_clk && ethernet_rx_dv) begin
-                    cnt_next = cnt_reg - 1'b1;
-                    state_next = break;
-                    frame_next = {ethernet_rx, frame_reg[7:4]};
-                end
-                else if (~ethernet_rx_dv) begin
+                if (ethernet_rx_dv & ethernet_rx_clk) begin
                     state_next = idle;
+                    frame_next = ethernet_rx;
+                    frame_ready_next = 1'b1;
                 end
             end
-            break: begin
-                if (~ethernet_rx_clk && ethernet_rx_dv) begin
-                    cnt_next = cnt_reg - 1'b1;
+            idle: begin
+                frame_ready_next = 1'b0;
+                if ((ethernet_rx_dv & ~ethernet_rx_clk) || (~ethernet_rx_dv)) begin
                     state_next = data;
-                end
-                else if (~ethernet_rx_dv) begin
-                    state_next = idle;
                 end
             end
         endcase
     end
 
-    always @* begin
-        preamble_next = preamble_reg;
-        if (idle == state_next) begin
-            preamble_next = 1'b0;
-        end
-        else if (data == state_next) begin
-            preamble_next = preamble_reg || (8'hd5 == frame_reg);
-        end
-    end
-
-    assign frame_ready = (2'b00 == cnt_reg) && (break == state_reg) && preamble_reg;
     assign frame = frame_reg;
+    assign frame_ready = frame_ready_reg;
 
 endmodule

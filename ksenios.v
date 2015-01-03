@@ -13,7 +13,7 @@ module ksenios (
                 output wire uart_tx_full, uart_tx_empty,
                 //ethernet signals
                 output wire ethernet_reset,
-                input wire ethernet_rx_clk, ethernet_rx_dv, ethernet_crs,
+                input wire ethernet_rx_clk, ethernet_rx_dv,
                 input wire [3:0] ethernet_rx,
                 output wire ethernet_mdc,
                 inout wire ethernet_mdio,
@@ -55,7 +55,7 @@ module ksenios (
 
     ram_controller ram_controller_unit (.clk(clk), .reset(reset), .mem(psram_mem_reg), .rw(psram_rw_reg), .address(address_reg), .data_in(address_reg[15:0]), .initialized(psram_initialized), .ready(psram_ready), .addr(addr), .oe(oe), .we(we), .cl(cl), .adv(adv), .ce(ce), .ub(ub), .lb(lb), .cre(cre), .dq(dq), .data_out(psram_data_out));
     
-    ethernet ethernet_unit (.clk(clk), .reset(reset), .ethernet_reset(ethernet_reset), .ethernet_rx_clk(ethernet_rx_clk), .ethernet_rx_dv(ethernet_rx_dv), .ethernet_crs(ethernet_crs), .ethernet_rx(ethernet_rx), .ethernet_mdc(ethernet_mdc), .ethernet_mdio(ethernet_mdio), .ethernet_rd(ethernet_rd_reg), .ethernet_ready(ethernet_ready), .ethernet_empty(ethernet_rx_empty), .ethernet_full(ethernet_rx_full), .frame_rx(frame_rx));
+    ethernet ethernet_unit (.clk(clk), .reset(reset), .ethernet_reset(ethernet_reset), .ethernet_rx_clk(ethernet_rx_clk), .ethernet_rx_dv(ethernet_rx_dv), .ethernet_rx(ethernet_rx), .ethernet_mdc(ethernet_mdc), .ethernet_mdio(ethernet_mdio), .ethernet_rd(ethernet_rd_reg), .ethernet_ready(ethernet_ready), .ethernet_empty(ethernet_rx_empty), .ethernet_full(ethernet_rx_full), .frame_rx(frame_rx));
     bin2ascii bin2ascii_unit1 (.bin(frame_rx[7:4]), .ascii(frame_rx_ascii1));
     bin2ascii bin2ascii_unit0 (.bin(frame_rx[3:0]), .ascii(frame_rx_ascii0));
     
