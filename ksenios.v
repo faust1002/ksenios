@@ -40,8 +40,8 @@ module ksenios (
     //ethernet part
     wire ethernet_ready;
     reg ethernet_rd_reg, ethernet_rd_next;
-    wire [7:0] frame_rx;
-    wire [7:0] frame_rx_ascii1, frame_rx_ascii0;
+    wire [7:0] byte_rx;
+    wire [7:0] byte_rx_ascii1, byte_rx_ascii0;
     //shift register part
     reg we_reg, we_next;
     reg dec_reg, dec_next;
@@ -55,9 +55,9 @@ module ksenios (
 
     ram_controller ram_controller_unit (.clk(clk), .reset(reset), .mem(psram_mem_reg), .rw(psram_rw_reg), .address(address_reg), .data_in(address_reg[15:0]), .initialized(psram_initialized), .ready(psram_ready), .addr(addr), .oe(oe), .we(we), .cl(cl), .adv(adv), .ce(ce), .ub(ub), .lb(lb), .cre(cre), .dq(dq), .data_out(psram_data_out));
     
-    ethernet ethernet_unit (.clk(clk), .reset(reset), .ethernet_reset(ethernet_reset), .ethernet_rx_clk(ethernet_rx_clk), .ethernet_rx_dv(ethernet_rx_dv), .ethernet_rx(ethernet_rx), .ethernet_mdc(ethernet_mdc), .ethernet_mdio(ethernet_mdio), .ethernet_rd(ethernet_rd_reg), .ethernet_ready(ethernet_ready), .ethernet_empty(ethernet_rx_empty), .ethernet_full(ethernet_rx_full), .frame_rx(frame_rx));
-    bin2ascii bin2ascii_unit1 (.bin(frame_rx[7:4]), .ascii(frame_rx_ascii1));
-    bin2ascii bin2ascii_unit0 (.bin(frame_rx[3:0]), .ascii(frame_rx_ascii0));
+    ethernet ethernet_unit (.clk(clk), .reset(reset), .ethernet_reset(ethernet_reset), .ethernet_rx_clk(ethernet_rx_clk), .ethernet_rx_dv(ethernet_rx_dv), .ethernet_rx(ethernet_rx), .ethernet_mdc(ethernet_mdc), .ethernet_mdio(ethernet_mdio), .ethernet_rd(ethernet_rd_reg), .ethernet_ready(ethernet_ready), .ethernet_empty(ethernet_rx_empty), .ethernet_full(ethernet_rx_full), .byte_rx(byte_rx));
+    bin2ascii bin2ascii_unit1 (.bin(byte_rx[7:4]), .ascii(byte_rx_ascii1));
+    bin2ascii bin2ascii_unit0 (.bin(byte_rx[3:0]), .ascii(byte_rx_ascii0));
     
     display display_unit (.clk(clk), .reset(reset), .hex0(errors_reg[3:0]), .hex1(errors_reg[7:4]), .hex2(errors_reg[11:8]), .hex3(errors_reg[15:12]), .dp(4'b0000), .an(an), .sseg(sseg));
     
@@ -145,7 +145,7 @@ module ksenios (
                     state_next = ethernet;
                     ethernet_rd_next = 1'b1;
                     we_next = 1'b1;
-                    data_next = {frame_rx_ascii1, frame_rx_ascii0};
+                    data_next = {byte_rx_ascii1, byte_rx_ascii0};
                 end
                 else begin
                     state_next = ready;

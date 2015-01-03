@@ -7,13 +7,13 @@ module ethernet (
                  inout wire ethernet_mdio,
                  input wire ethernet_rd,
                  output wire ethernet_ready, ethernet_empty, ethernet_full,
-                 output wire [7:0] frame_rx
+                 output wire [7:0] byte_rx
                 );
 
     wire init;
-    wire frame_ready, aggregated_frame_ready;
-    wire [3:0] frame;
-    wire [7:0] aggregated_frame;
+    wire nibble_ready, byte_ready;
+    wire [3:0] nibble;
+    wire [7:0] byte;
 
     ethernet_init ethernet_init_unit (.clk(clk), .reset(reset), .ethernet_reset(ethernet_reset),
                                       .ethernet_mdc(ethernet_mdc), .ethernet_mdio(ethernet_mdio),
@@ -21,14 +21,14 @@ module ethernet (
 
     ethernet_rx ethernet_rx_unit (.clk(clk), .reset(reset), .start(init), .ethernet_rx_clk(ethernet_rx_clk),
                                   .ethernet_rx_dv(ethernet_rx_dv), .ethernet_rx(ethernet_rx),
-                                  .frame_ready(frame_ready), .frame(frame));
+                                  .nibble_ready(nibble_ready), .nibble(nibble));
 
-    ethernet_frame_aggegator ethernet_frame_aggegator_unit (.clk(clk), .reset(reset), .inframe(frame),
-                                                            .inready(frame_ready), .outframe(aggregated_frame),
-                                                            .outready(aggregated_frame_ready));
+    ethernet_nibble_aggegator ethernet_nibble_aggegator_unit (.clk(clk), .reset(reset), .nibble(nibble),
+                                                            .nibble_ready(nibble_ready), .byte(byte),
+                                                            .byte_ready(byte_ready));
 
-    fifo fifo_unit0 (.clk(clk), .reset(reset), .rd(ethernet_rd), .wr(init && aggregated_frame_ready),
-                     .w_data(aggregated_frame), .empty(ethernet_empty), .full(ethernet_full), .r_data(frame_rx));
+    fifo fifo_unit0 (.clk(clk), .reset(reset), .rd(ethernet_rd), .wr(init && byte_ready),
+                     .w_data(byte), .empty(ethernet_empty), .full(ethernet_full), .r_data(byte_rx));
 
     assign ethernet_ready = init;
 
