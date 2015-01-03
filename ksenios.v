@@ -47,7 +47,7 @@ module ksenios (
     reg dec_reg, dec_next;
     wire empty;
     wire [7:0] uart_w_data;
-    reg [23:0] data_reg, data_next;
+    reg [15:0] data_reg, data_next;
     //debounce part
     wire wr_uart;
     //errors
@@ -64,7 +64,7 @@ module ksenios (
     uart uart_unit (.clk(clk), .reset(reset), .tx(uart_tx), .wr_uart(wr_uart), .w_data(uart_w_data), .tx_full(uart_tx_full), .tx_empty(uart_tx_empty));
     assign wr_uart = ~empty && (state_reg !== undefined) && ~uart_tx_full;
 
-    shift_register #(.L(3)) shift_register_unit (.clk(clk), .reset(reset), .data_in(data_reg), .we(we_reg), .en(~uart_tx_full), .dec(dec_reg), .data_out(uart_w_data), .empty(empty));
+    shift_register #(.L(2)) shift_register_unit (.clk(clk), .reset(reset), .data_in(data_reg), .we(we_reg), .en(~uart_tx_full), .dec(dec_reg), .data_out(uart_w_data), .empty(empty));
 
     always @(posedge clk, posedge reset)
         if (reset) begin
@@ -75,7 +75,7 @@ module ksenios (
             ethernet_rd_reg <= 1'b0;
             we_reg <= 1'b0;
             dec_reg <= 1'b1;
-            data_reg <= 88'h0;
+            data_reg <= 24'h0;
             errors_reg <= 16'h0;
         end
         else begin
@@ -145,7 +145,7 @@ module ksenios (
                     state_next = ethernet;
                     ethernet_rd_next = 1'b1;
                     we_next = 1'b1;
-                    data_next = {frame_rx_ascii1, frame_rx_ascii0, 8'h20};
+                    data_next = {frame_rx_ascii1, frame_rx_ascii0};
                 end
                 else begin
                     state_next = ready;
