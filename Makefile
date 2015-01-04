@@ -15,6 +15,7 @@ DESIGN=ksenios
 SRC=ksenios.v \
 	psram/ram_controller.v \
     ethernet/ethernet.v ethernet/ethernet_init.v ethernet/ethernet_nibble_aggregator.v ethernet/ethernet_smi.v ethernet/ethernet_rx.v \
+    ethernet/ethernet_preamble_detector.v \
     uart/baud_rate_generator.v uart/uart.v uart/uart_tx.v uart/uart_rx.v \
     utils/display.v utils/debounce.v utils/fifo.v utils/xilinx_dist_ram_16x8.v utils/shift_register.v utils/bin2ascii.v
 UCF=Nexys3_Master.ucf
