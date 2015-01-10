@@ -4,8 +4,8 @@ module ethernet_rx (
                     input wire ethernet_rx_clk, ethernet_rx_dv,
                     input wire [3:0] ethernet_rx,
                     output wire nibble_ready,
-                    output wire [3:0] nibble,
-                    output wire last_nibble
+                    output wire [3:0] nibble/*,
+                    output wire last_nibble*/
                    );
 
     localparam [1:0] undefined = 2'b00,
@@ -15,20 +15,20 @@ module ethernet_rx (
     reg [1:0] state_reg, state_next;
     reg [3:0] nibble_reg, nibble_next;
     reg nibble_ready_reg, nibble_ready_next;
-    reg last_nibble_reg, last_nibble_next;
+    //reg last_nibble_reg, last_nibble_next;
 
     always @(posedge clk, posedge reset) begin
         if (reset) begin
             state_reg <= undefined;
             nibble_reg <= 4'h0;
             nibble_ready_reg <= 1'b0;
-            last_nibble_reg <= 1'b0;
+            //last_nibble_reg <= 1'b0;
         end
         else begin
             state_reg <= state_next;
             nibble_reg <= nibble_next;
             nibble_ready_reg <= nibble_ready_next;
-            last_nibble_reg <= last_nibble_next;
+            //last_nibble_reg <= last_nibble_next;
         end
     end
 
@@ -36,7 +36,7 @@ module ethernet_rx (
         state_next = state_reg;
         nibble_next = nibble_reg;
         nibble_ready_next = nibble_ready_reg;
-        last_nibble_next = last_nibble_reg;
+        //last_nibble_next = last_nibble_reg;
         case (state_reg)
             undefined: begin
                 if (start) begin
@@ -44,7 +44,7 @@ module ethernet_rx (
                 end
             end
             data: begin
-                last_nibble_next = 1'b0;
+                //last_nibble_next = 1'b0;
                 if (ethernet_rx_dv & ethernet_rx_clk) begin
                     state_next = idle;
                     nibble_next = ethernet_rx;
@@ -55,7 +55,7 @@ module ethernet_rx (
                 nibble_ready_next = 1'b0;
                 if (~ethernet_rx_dv) begin
                     state_next = data;
-                    last_nibble_next = 1'b1;
+                    //last_nibble_next = 1'b1;
                 end
                 else if (ethernet_rx_dv & ~ethernet_rx_clk) begin
                     state_next = data;
@@ -66,6 +66,6 @@ module ethernet_rx (
 
     assign nibble = nibble_reg;
     assign nibble_ready = nibble_ready_reg;
-    assign last_nibble = last_nibble_reg;
+    //assign last_nibble = last_nibble_reg;
 
 endmodule

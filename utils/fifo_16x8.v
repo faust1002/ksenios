@@ -1,4 +1,4 @@
-module fifo (
+module fifo_16x8 (
     input wire clk, reset,
     input wire [7:0] w_data,
     input wire wr, rd,
@@ -11,10 +11,8 @@ module fifo (
 
     reg [3:0] wr_reg, rd_reg, wr_next, rd_next;
     reg [4:0] cnt_reg, cnt_next;
-    `ifndef TESTBENCH
     xilinx_dist_ram_16x8 ram_unit (.data_in(w_data), .data_out(r_data),
                                    .waddr(wr_reg), .raddr(rd_reg), .we(wr), .wclk(clk));
-    `endif
 
     always @(posedge clk, posedge reset) begin
         if (reset) begin
